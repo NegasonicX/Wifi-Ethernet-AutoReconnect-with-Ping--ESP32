@@ -383,7 +383,7 @@ void app_main(void)
     printf("MAC Address for the device = %s \n",mac_json);                              //++ Get the MAC Address of the ESP
 
     wifi_init_sta();                                                                    //++ Call the Wifi Initializing Function
-    // ethernet_init_sta();                                                             //++ Call the Ethernet Initializing Function
+    ethernet_init_sta();                                                             //++ Call the Ethernet Initializing Function
      
     gpio_set_direction(builtin, GPIO_MODE_OUTPUT);                                      //++ Set the built-in LED direction as OUTPUT
     gpio_set_level(builtin,0);
