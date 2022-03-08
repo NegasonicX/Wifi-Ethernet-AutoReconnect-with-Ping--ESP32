@@ -28,6 +28,15 @@
 #include "lwip/err.h"
 #include "lwip/sys.h"
 
+/**
+ * Brief:
+ * This code shows a basic logic to perform inter-task communication using multiple queues
+ *
+ * GPIO status:
+ * GPIO2   : output ( built-in LED on Devkit V1 )
+ *
+ */
+
 //.............Indication Declarations.....................
 #define builtin 26                                                       //++ Built-in LED of Devkit v1
 
@@ -213,14 +222,10 @@ static void got_ip_event_handler(void *arg, esp_event_base_t event_base,
 //---------------------------------------------------------------------------------------------------------------------------
 void ethernet_init_sta()                                                            //++ Ethernet Initialising Function
 {
-   // ESP_ERROR_CHECK(esp_netif_init());
-    // Create default event loop that running in background
-    //ESP_ERROR_CHECK(esp_event_loop_create_default());
-
     esp_netif_config_t netif_cfg = ESP_NETIF_DEFAULT_ETH();
     esp_netif_t *eth_netif = esp_netif_new(&netif_cfg);
    
-   spi_bus_config_t buscfg = {
+    spi_bus_config_t buscfg = {
         .miso_io_num = CONFIG_EXAMPLE_ENC28J60_MISO_GPIO,
         .mosi_io_num = CONFIG_EXAMPLE_ENC28J60_MOSI_GPIO,
         .sclk_io_num = CONFIG_EXAMPLE_ENC28J60_SCLK_GPIO,
@@ -228,7 +233,7 @@ void ethernet_init_sta()                                                        
         .quadhd_io_num = -1,
     };
    
-     ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_EXAMPLE_ENC28J60_SPI_HOST, &buscfg, SPI_DMA_CH_AUTO));
+    ESP_ERROR_CHECK(spi_bus_initialize(CONFIG_EXAMPLE_ENC28J60_SPI_HOST, &buscfg, SPI_DMA_CH_AUTO));
     /* ENC28J60 ethernet driver is based on spi driver */
     spi_device_interface_config_t devcfg = {
         .command_bits = 3,
@@ -240,13 +245,13 @@ void ethernet_init_sta()                                                        
         .cs_ena_posttrans = enc28j60_cal_spi_cs_hold_time(CONFIG_EXAMPLE_ENC28J60_SPI_CLOCK_MHZ),
     };
 
-   spi_device_handle_t spi_handle = NULL;
+    spi_device_handle_t spi_handle = NULL;
     ESP_ERROR_CHECK(spi_bus_add_device(CONFIG_EXAMPLE_ENC28J60_SPI_HOST, &devcfg, &spi_handle));
 
-     eth_enc28j60_config_t enc28j60_config = ETH_ENC28J60_DEFAULT_CONFIG(spi_handle);
+    eth_enc28j60_config_t enc28j60_config = ETH_ENC28J60_DEFAULT_CONFIG(spi_handle);
     enc28j60_config.int_gpio_num = CONFIG_EXAMPLE_ENC28J60_INT_GPIO;
 
-      eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
+    eth_mac_config_t mac_config = ETH_MAC_DEFAULT_CONFIG();
     mac_config.smi_mdc_gpio_num = -1;  // ENC28J60 doesn't have SMI interface
     mac_config.smi_mdio_gpio_num = -1;
     esp_eth_mac_t *mac = esp_eth_mac_new_enc28j60(&enc28j60_config, &mac_config);
@@ -256,7 +261,7 @@ void ethernet_init_sta()                                                        
     phy_config.reset_gpio_num = -1; // ENC28J60 doesn't have a pin to reset internal PHY
     esp_eth_phy_t *phy = esp_eth_phy_new_enc28j60(&phy_config);
 
-     esp_eth_config_t eth_config = ETH_DEFAULT_CONFIG(mac, phy);
+    esp_eth_config_t eth_config = ETH_DEFAULT_CONFIG(mac, phy);
     esp_eth_handle_t eth_handle = NULL;
     ESP_ERROR_CHECK(esp_eth_driver_install(&eth_config, &eth_handle));
 
@@ -276,38 +281,10 @@ void ethernet_init_sta()                                                        
    
    
     // Set default handlers to process TCP/IP stuffs
-   ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
+    ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
     //-------------------------------------------------------------------------------------------------------
-   
-//    if(strcmp(nvs_sta_edhcp,"0")==0)
-//    {
-//       // printf(" Trueee \n"); 
-//     ESP_ERROR_CHECK(esp_netif_dhcpc_stop(eth_netif));
-//     // char* ip= "192.168.1.251";
-//     // char* gateway = "192.168.1.1";
-//     // char* netmask = "255.255.255.0";
-//     // char* dns = "8.8.8.8";
-//     esp_netif_ip_info_t info_t;
-//     //esp_netif_dns_info_t dns_info;
-//     memset(&info_t, 0, sizeof(esp_netif_ip_info_t));
-//     info_t.ip.addr = esp_ip4addr_aton((const char *)nvs_sta_eip);
-//     info_t.gw.addr = esp_ip4addr_aton((const char *)nvs_sta_egw);
-//     info_t.netmask.addr = esp_ip4addr_aton((const char *) nvs_sta_esnt);
-//     // dns_info.ip.u_addr = esp_ip4addr_aton((const char *)dns);
-//     // IP_ADDR4(&dns_info.ip, 208, 91, 112, 53);
-//     esp_netif_set_ip_info(eth_netif, &info_t); 
-//         // ESP_LOGI(TAG, "Success to set static ip: %s, netmask: %s, gw: %s", nvs_sta_eip, nvs_sta_egw, nvs_sta_esnt);
-//         ESP_ERROR_CHECK(example_set_dns_server(eth_netif, ipaddr_addr(nvs_sta_edns1), ESP_NETIF_DNS_MAIN));
-//         ESP_ERROR_CHECK(example_set_dns_server(eth_netif, ipaddr_addr(nvs_sta_edns2), ESP_NETIF_DNS_BACKUP));
-//     // esp_netif_set_dns_info(eth_netif, esp_ip4addr_aton(nvs_sta_edns1), &dns_info);
-//     //    esp_netif_set_dns_info(eth_netif, nvs_sta_edns2, &dns_info);
-//     //    ESP_ERROR_CHECK(esp_eth_set_default_handlers(eth_netif));
-//    }
-    //-------------------------------------------------------------------------------------------------------
-
     
     /* attach Ethernet driver to TCP/IP stack */
-    // ESP_ERROR_CHECK(esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handle)));
     esp_netif_attach(eth_netif, esp_eth_new_netif_glue(eth_handle));
    
    
