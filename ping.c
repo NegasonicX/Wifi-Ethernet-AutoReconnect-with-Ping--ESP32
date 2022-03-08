@@ -1,10 +1,7 @@
 /*
-	 This example code is in the Public Domain (or CC0 licensed, at your option.)
-
-	 Unless required by applicable law or agreed to in writing, this
-	 software is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
-	 CONDITIONS OF ANY KIND, either express or implied.
+STANDARD PING LIRARBY TO PERFORM PING OPERATIONS FROM EPS32
 */
+
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "esp_wifi.h"
@@ -43,7 +40,7 @@ void cmd_ping_on_ping_success(esp_ping_handle_t hdl, void *args)
 	esp_ping_get_profile(hdl, ESP_PING_PROF_TIMEGAP, &elapsed_time, sizeof(elapsed_time));
 
 #if 1
-	// ESP_LOGI(TAG, "%d bytes from %s icmp_seq=%d ttl=%d time=%d ms", recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);
+	// ESP_LOGI(TAG, "%d bytes from %s icmp_seq=%d ttl=%d time=%d ms", recv_len, inet_ntoa(target_addr.u_addr.ip4), seqno, ttl, elapsed_time);	//++ Uncomment this line if want to know ping responses
 #else
 	wifi_ap_record_t wifidata;
 	esp_wifi_sta_get_ap_info(&wifidata);
@@ -58,7 +55,7 @@ void cmd_ping_on_ping_timeout(esp_ping_handle_t hdl, void *args)
 	ip_addr_t target_addr;
 	esp_ping_get_profile(hdl, ESP_PING_PROF_SEQNO, &seqno, sizeof(seqno));
 	esp_ping_get_profile(hdl, ESP_PING_PROF_IPADDR, &target_addr, sizeof(target_addr));
-	// ESP_LOGW(TAG, "From %s icmp_seq=%d timeout", inet_ntoa(target_addr.u_addr.ip4), seqno);
+	// ESP_LOGW(TAG, "From %s icmp_seq=%d timeout", inet_ntoa(target_addr.u_addr.ip4), seqno);		//++ Uncomment this line if want to know when ping timeout happens
 }
 
 void cmd_ping_on_ping_end(esp_ping_handle_t hdl, void *args)
@@ -71,11 +68,11 @@ void cmd_ping_on_ping_end(esp_ping_handle_t hdl, void *args)
 	loss = (uint32_t)((1 - ((float)received) / transmitted) * 100);
 	if (IP_IS_V4(&target_addr)) 
 	{
-		// ESP_LOGI(TAG, "\n--- %s ping statistics ---", inet_ntoa(*ip_2_ip4(&target_addr)));
+		ESP_LOGI(TAG, "\n--- %s ping statistics ---", inet_ntoa(*ip_2_ip4(&target_addr)));
 	} 
 	else 
 	{
-		// ESP_LOGI(TAG, "\n--- %s ping statistics ---", inet6_ntoa(*ip_2_ip6(&target_addr)));
+		ESP_LOGI(TAG, "\n--- %s ping statistics ---", inet6_ntoa(*ip_2_ip6(&target_addr)));
 	}
 	ESP_LOGI(TAG, "%d packets transmitted, %d received, %d%% packet loss, time %dms", transmitted, received, loss, total_time_ms);
 	// delete the ping sessions, so that we clean up all resources and can create a new ping session
@@ -83,28 +80,29 @@ void cmd_ping_on_ping_end(esp_ping_handle_t hdl, void *args)
 	esp_ping_delete_session(hdl);
 }
 
-int cmd_ping_on_ping_results(int select)
+int cmd_ping_on_ping_results(int select)		//++ pass value 0 to 3 to get the desired result of ping
 {
 	switch(select)
 	{
 		case 0:
-			return transmitted;
+			return transmitted;					//++ Number of packets transmitted
 		case 1:
-			return received;
+			return received;					//++ Number of packets received
 		case 2:
-			return loss;
+			return loss;						//++ % of loss 
 		case 3:
-			return total_time_ms;
+			return total_time_ms;				//++ Total time in milliseconds 
 		default:
 			return -1;
 	}
 }
 
 /*
-ping to targer forever
-interval_ms:ping interval mSec. Default is 1000mSec.
-task_prio:ping task priority. Default is 2.
-target_host:target host url. if null,target is own gateway.
+Initializes the ping routine
+interval_ms : Intervals in milliseconds to ping the host
+task_prio 	: Sets the priority of ping task
+target_host : Specifies the ping target host 
+ping_count 	: Number of the times ping should be done in each cycle
 */
 esp_err_t initialize_ping(uint32_t interval_ms, uint32_t task_prio, char * target_host, int ping_count)
 {
@@ -165,11 +163,11 @@ esp_err_t initialize_ping(uint32_t interval_ms, uint32_t task_prio, char * targe
 
 	if(ping_count == -1)
 	{
-		ping_config.count = ESP_PING_COUNT_INFINITE;   // ping in infinite mode, esp_ping_stop can stop it
+		ping_config.count = ESP_PING_COUNT_INFINITE;   //++ ping in infinite mode, esp_ping_stop can stop it
 	}
 	else
 	{
-		ping_config.count = ping_count;	
+		ping_config.count = ping_count;				   //++ Pings "ping_count" number of times
 	}
 	ping_config.interval_ms = interval_ms;
 	ping_config.task_prio = task_prio;
