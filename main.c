@@ -29,7 +29,7 @@
 #include "lwip/sys.h"
 
 //.............Indication Declarations.....................
-#define builtin 2                                                       //++ Built-in LED of Devkit v1
+#define builtin 26                                                       //++ Built-in LED of Devkit v1
 
 char mac_json[50];                                                      //++ Array to store MAC Address of ESP32
 uint8_t base_mac_addr[6] = {0};
@@ -57,7 +57,6 @@ static const char *TAG_wifi = "Wifi";                                   //++ TAG
 //.............Ethernet Declarations.....................
 static const char *TAG_eth = "Ethernet";                                //++ TAG for Ethernet logs
 bool ethernet_connection_flag = false;                                  //++ To check whether ESP is connected to Ethernet Cable
-
 
 //---------------------------------------------------------------------------------------------------------------------------
 static void event_handler(void* arg, esp_event_base_t event_base, int32_t event_id, void* event_data)   //++ Handler for Wifi ( executes only once on boot )
@@ -179,7 +178,7 @@ static void eth_event_handler(void *arg, esp_event_base_t event_base, int32_t ev
             
         break;
     case ETHERNET_EVENT_DISCONNECTED:
-        ESP_LOGI(TAG_eth, "Ethernet Link Down");
+        ESP_LOGE(TAG_eth, "Ethernet Link Down");
         ethernet_connection_flag = false;
         break;
     case ETHERNET_EVENT_START:
@@ -337,7 +336,7 @@ void reconnection()                                                             
             do{                                                                             //++ Loop to perform one complete cycle of ping function
                 initialize_ping(ping_interval_ms, ping_priority, TARGET_HOST, ping_count);  //++ Initialize the ping process
 
-                vTaskDelay(ping_interval_ms*ping_count / portTICK_PERIOD_MS);               //++ Wait for the complete execution to complete and take the response
+                vTaskDelay((ping_interval_ms*ping_count + 500) / portTICK_PERIOD_MS);               //++ Wait for the complete execution to complete and take the response
 
                 int loss = cmd_ping_on_ping_results(2);                                     //++ Extract the loss % from the ping cycle
 
@@ -357,7 +356,7 @@ void reconnection()                                                             
             }while(ping_stop_flag==false);
         }
 
-        else if(rssi == 0 || rssi < -100)                              //++ If RSSI is 0 or beyond -100, ESP is connected to AP and try establishing the connection
+        if(rssi == 0 || rssi < -100)                              //++ If RSSI is 0 or beyond -100, ESP is connected to AP and try establishing the connection
         {
             gpio_set_level(builtin,0);
             ESP_LOGI(TAG_wifi, "Lost AP Radio, Trying to Establish Network.....");
@@ -377,6 +376,8 @@ void app_main(void)
       ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+
+    gpio_install_isr_service(0);
     
     esp_efuse_mac_get_default(base_mac_addr);;
     sprintf(mac_json,"%x:%x:%x:%x:%x:%x", base_mac_addr[0], base_mac_addr[1], base_mac_addr[2], base_mac_addr[3], base_mac_addr[4], base_mac_addr[5]);
