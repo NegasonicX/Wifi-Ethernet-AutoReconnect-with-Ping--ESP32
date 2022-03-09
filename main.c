@@ -38,7 +38,7 @@
  */
 
 //.............Indication Declarations.....................
-#define builtin 26                                                       //++ Built-in LED of Devkit v1
+#define builtin 2                                                       //++ Built-in LED of Devkit v1
 
 char mac_json[50];                                                      //++ Array to store MAC Address of ESP32
 uint8_t base_mac_addr[6] = {0};
