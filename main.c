@@ -53,8 +53,8 @@ char *TARGET_HOST = "www.google.com";                                   //++ Spe
 bool ping_stop_flag = false;                                            //++ Flag to execute entire ping process one in while loop
 
 //.............Wifi Declarations.....................
-#define EXAMPLE_WIFI_SSID             "J@RV!$"                          //++ Set up your AP SSID which ESP will connect with
-#define EXAMPLE_WIFI_PASS             "0123456789"                      //++ Set up your AP PASSWORD which ESP will connect with
+#define EXAMPLE_WIFI_SSID             "<AP SSID>"                          //++ Set up your AP SSID which ESP will connect with
+#define EXAMPLE_WIFI_PASS             "<AP PASSWORD>"                      //++ Set up your AP PASSWORD which ESP will connect with
 #define EXAMPLE_MAXIMUM_RETRY         2                                 //++ Set the number of attempts ESP makes to connect the AP on boot
 #define WIFI_CONNECTED_BIT BIT0
 #define WIFI_FAIL_BIT      BIT1
