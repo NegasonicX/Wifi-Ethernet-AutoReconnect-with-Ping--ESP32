@@ -1,5 +1,5 @@
 # Wifi & Ethernet AutoReconnect with Ping on ESP32
-This code aims to use both Wifi and Ethernet together as well as determines where ESP32 is getting Internet services vis Ping process.
+This code aims to use both Wifi and Ethernet together as well as determines whether ESP32 is getting Internet services vis Ping process.
 
 ## GPIO Functions:
 I am using ENC28J60 Ethernet Module and Devkit v1's integrated Wifi.
