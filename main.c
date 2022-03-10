@@ -30,10 +30,14 @@
 
 /**
  * Brief:
- * This code shows a basic logic to perform inter-task communication using multiple queues
+ * This code aims to demonstrate how to ping a host from ESP to know whether Internet Servies are available via Wifi as well as Ethernet
  *
  * GPIO status:
  * GPIO2   : output ( built-in LED on Devkit V1 )
+ * GPIO 18 : SCLK
+ * GPIO 23 : MOSI
+ * GPIO 19 : MISO
+ * GPIO 5  : CS
  *
  */
 
