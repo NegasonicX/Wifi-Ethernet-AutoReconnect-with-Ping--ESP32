@@ -21,4 +21,4 @@ I am using ENC28J60 Ethernet Module and Devkit v1's integrated Wifi.
 
 ## Conclusion:
 * So far, I believe ping is the only method to know whether we are having active Internet Services
-* **VERY IMPORTANT: ESP gives WIFI connection prioirty over Ethernet by default ( at least in my test cases ). Hence, if your ESP is connected to an AP but isn't receiving any Internet Packages, it won't shift to Ethernet!!**
+* **VERY IMPORTANT: ESP gives WIFI connection priority over Ethernet by default ( at least in my test cases ). Hence, if your ESP is connected to an AP but isn't receiving any Internet Packages, it won't shift to Ethernet!!**
