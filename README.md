@@ -3,11 +3,12 @@ This code aims to use both Wifi and Ethernet together as well as determines wher
 
 ## GPIO Functions:
 I am using ENC28J60 Ethernet Module and Devkit v1's integrated Wifi.
-* GPIO 18 :
-*
-*
-*
-*
+* GPIO 18 : SCLK 
+* GPIO 23 : MOSI
+* GPIO 19 : MISO
+* GPIO 5  : CS
+* SPI CLOCK MHz : 8MHz
+* **NOTE : SDK Configurations for SPI has to be done on individual level**
 
 ## Understanding the Flow:
 * This code is developed for ESP32 on Embedded C Language using FreeRTOS.
